@@ -1,4 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Constants from "expo-constants";
+import * as Linking from "expo-linking";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -22,6 +24,8 @@ export function SettingsScreen() {
     data.settings?.reportOwnerName || "My Khata",
   );
   const currentReportOwnerName = data.settings?.reportOwnerName || "My Khata";
+  const appVersion = Constants.expoConfig?.version || "1.0.0";
+  const androidVersionCode = Constants.expoConfig?.android?.versionCode;
 
   useEffect(() => {
     setReportOwnerName(currentReportOwnerName);
@@ -57,6 +61,28 @@ export function SettingsScreen() {
     <AppShell title="Settings" subtitle="Manage backup and report preferences.">
       <>
         <ScrollView contentContainerStyle={styles.content}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>App version</Text>
+            <Text style={styles.sectionText}>Version: {appVersion}</Text>
+            {androidVersionCode ? (
+              <Text style={styles.sectionText}>Android build: {androidVersionCode}</Text>
+            ) : null}
+            <View style={styles.supportRow}>
+              <MaterialIcons name="mail-outline" size={18} color="#23423b" />
+              <View style={styles.supportTextWrap}>
+                <Text style={styles.sectionText}>
+                  Report bugs or share suggestions:
+                </Text>
+                <Pressable
+                  onPress={() => void Linking.openURL("mailto:dev.pradip.mandal@gmail.com")}
+                  style={({ pressed }) => pressed && styles.pressed}
+                >
+                  <Text style={styles.emailText}>dev.pradip.mandal@gmail.com</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+
           <View style={styles.section}>
             <Pressable
               onPress={() => setIsBackupOpen((current) => !current)}
@@ -183,6 +209,21 @@ const styles = StyleSheet.create({
   },
   row: {
     gap: 12,
+  },
+  supportRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    marginTop: 6,
+  },
+  supportTextWrap: {
+    flex: 1,
+    gap: 2,
+  },
+  emailText: {
+    fontSize: 14,
+    color: "#0f766e",
+    fontWeight: "600",
   },
   modalOverlay: {
     flex: 1,
