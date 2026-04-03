@@ -274,6 +274,39 @@ npm run ios
 npm run web
 ```
 
+## Build APK
+
+This project is configured for direct APK distribution outside the Play Store.
+
+### Build command
+
+```bash
+npx eas-cli login
+npx eas-cli build -p android --profile preview
+```
+
+### Current Android release identity
+
+- App name: `My Khata`
+- Package name: `com.pradipmandal.mykhata`
+- App version: `1.0.0`
+- Android version code: `1`
+
+### Distribution note
+
+
+Typical user flow:
+
+1. Download APK from your website
+2. Open it on Android
+3. Allow installation from unknown sources if Android asks
+4. Install the app
+
+When you publish a new APK later, increase:
+
+- `expo.version`
+- `expo.android.versionCode`
+
 ## Important Files
 
 - `screens/home-screen.tsx`
