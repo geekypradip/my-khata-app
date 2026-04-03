@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "my-khata-app",
+    "name": "My Khata",
     "slug": "my-khata-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -27,6 +27,13 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow My Khata to select people from your contacts."
+        }
+      ],
+      "expo-document-picker",
       [
         "expo-splash-screen",
         {

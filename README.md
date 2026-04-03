@@ -1,50 +1,305 @@
-# Welcome to your Expo app 👋
+# My Khata
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+`My Khata` is an offline-first Expo mobile app for personal ledger tracking.
+It combines:
 
-## Get started
+- a khata / udhar ledger for people
+- expense-category tracking using the same transaction engine
+- local JSON backup and restore
+- person-wise JSON import
+- shareable PDF reports
+
+No backend, login, or remote API is required. Everything is stored locally on the device with AsyncStorage.
+
+## What The App Does
+
+### People khata
+
+- Add a person manually
+- Pick a person from device contacts
+- Store name and optional phone number
+- Add `given` and `received` transactions
+- Edit and delete transactions
+- Handle partial payments naturally through multiple entries
+- Compute balance from transactions only
+
+### Expense categories
+
+- Create expense items inside the `Expenses` tab in Khata
+- Track expense movement using the same transaction model
+- Convert a person to an expense category
+- Convert an expense category back to a person
+
+### Import, backup, and restore
+
+- Export all app data as a JSON file
+- Restore all app data from JSON
+- Import transactions for one specific person or expense category
+- Support both file upload and pasted JSON
+- Import using:
+  - `merge with existing`
+  - `replace existing`
+- Download an example import JSON file
+
+### Reports
+
+- Generate a PDF report for a specific person or expense category
+- Share the report using device share options
+- PDF report includes:
+  - transaction table
+  - final due / advance / total expense summary
+  - customer-facing wording for person reports
+  - custom report provider name from Settings
+
+### Settings
+
+- Change report provider name
+- Export backup
+- Import backup
+
+## Main Screens
+
+### Home
+
+- summary cards for people balances
+- total expense card
+- people / expenses breakdown
+- entries breakdown
+- settings shortcut
+
+### Khata
+
+- segmented tabs for `People` and `Expenses`
+- `Add person` action in People tab
+- `Create expense` action in Expenses tab
+- balance-aware khata list
+
+### Person / Expense detail
+
+- compact balance card
+- grouped transaction history by date
+- quick `Given` and `Received` actions
+- menu for edit, delete, import transactions, PDF report, and category conversion
+
+### Settings
+
+- data backup accordion
+- report provider name editor
+
+## Tech Stack
+
+- React Native
+- Expo
+- Expo Router
+- AsyncStorage
+- expo-contacts
+- expo-document-picker
+- expo-file-system
+- expo-sharing
+- expo-print
+
+## Data Model
+
+All data is stored as local JSON.
+
+```json
+{
+  "persons": [
+    {
+      "id": "person_1",
+      "name": "Amit Sharma",
+      "phoneNumber": "+91 9876543210",
+      "isExpenseCategory": false,
+      "createdAt": "2026-04-01T09:00:00.000Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "txn_1",
+      "personId": "person_1",
+      "type": "given",
+      "amount": 1200,
+      "note": "Groceries advance",
+      "date": "2026-04-01",
+      "createdAt": "2026-04-01T09:15:00.000Z"
+    }
+  ],
+  "settings": {
+    "reportOwnerName": "My Khata"
+  }
+}
+```
+
+### Notes
+
+- `isExpenseCategory` is optional
+- balances are never stored directly
+- IDs are generated locally
+- all calculations are derived from transactions
+
+## Transaction Logic
+
+Transaction meaning from the app owner point of view:
+
+- `given`: money you gave
+- `received`: money you got back
+
+Balance behavior:
+
+- positive balance: you will get money
+- negative balance: you have advance
+
+For expense categories, the same transaction engine is reused, but Home and PDF reports present the values as expense totals.
+
+## Person Transaction Import Format
+
+You can import one person’s transactions using either:
+
+- a raw JSON array
+- an object with a `transactions` array
+
+### Accepted JSON
+
+```json
+{
+  "transactions": [
+    {
+      "type": "given",
+      "amount": 500,
+      "note": "Sample advance",
+      "date": "2026-04-01"
+    },
+    {
+      "type": "received",
+      "amount": 150,
+      "date": "2026-04-03"
+    }
+  ]
+}
+```
+
+or
+
+```json
+[
+  {
+    "type": "given",
+    "amount": 500,
+    "note": "Sample advance",
+    "date": "2026-04-01"
+  }
+]
+```
+
+### Import rules
+
+- `type` must be `given` or `received`
+- `amount` must be a non-negative number
+- `date` must be a valid date string
+- `note` is optional
+- imported rows get fresh local IDs automatically
+
+## PDF Report Behavior
+
+Reports are generated per person or expense category.
+
+### Person report
+
+The PDF is written from the recipient’s point of view:
+
+- `You have to pay`
+- `You paid advance`
+- row labels like `You received` and `You paid`
+
+### Expense report
+
+The PDF uses expense-friendly wording:
+
+- `Total expense`
+- row labels `Paid` and `Received`
+
+The report footer uses the custom report provider name from Settings.
+
+## Example Initial Data
+
+On first launch, the app seeds example data so the UI is not empty:
+
+- `Amit Sharma`
+- `Priya Verma`
+- sample khata transactions
+- default report owner name: `My Khata`
+
+The seed file lives in `storage/sample-data.ts`.
+
+## Project Structure
+
+```text
+app/
+  (tabs)/
+  person/
+  settings.tsx
+components/
+hooks/
+screens/
+storage/
+types/
+utils/
+```
+
+## Run The App
 
 1. Install dependencies
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Start Expo
 
-## Learn more
+```bash
+npm run start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+3. Open the app
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- press `a` for Android
+- press `i` for iOS
+- scan the QR code in Expo Go
 
-## Join the community
+Optional:
 
-Join our community of developers creating universal apps.
+```bash
+npm run android
+npm run ios
+npm run web
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Important Files
+
+- `screens/home-screen.tsx`
+  Home dashboard
+- `screens/khata-screen.tsx`
+  People and expense-category list UI
+- `screens/person-detail-screen.tsx`
+  Transaction entry, import, PDF report, and conversion actions
+- `screens/settings-screen.tsx`
+  Backup and report name settings
+- `hooks/use-app-data.tsx`
+  Main app state and actions
+- `storage/app-storage.ts`
+  AsyncStorage persistence
+- `utils/backup.ts`
+  Backup / restore and JSON import helpers
+- `utils/report.ts`
+  PDF report generation
+- `utils/validation.ts`
+  Data validation and safe import parsing
+
+## Verification
+
+This app was verified with:
+
+```bash
+npx tsc --noEmit
+npm run lint
+```
