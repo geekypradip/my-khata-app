@@ -289,7 +289,7 @@ npx eas-cli build -p android --profile preview
 
 Latest build:
 
-[Download from Expo build page](https://expo.dev/accounts/geekypradip/projects/my-khata-app/builds/3b944270-1b77-4f6b-a49f-78a3e4211c13)
+[Download from Expo build page](https://expo.dev/accounts/geekypradip/projects/my-khata-app/builds/)
 
 ### Current Android release identity
 
